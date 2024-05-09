@@ -1,0 +1,33 @@
+services:
+  app:
+    restart: always
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app:/app
+    depends_on:
+      - postgresql
+    env_file:
+      - ./.env
+    command: "sh -c 'gunicorn -w 3 -k uvicorn.workers.UvicornWorker main:app \
+      --bind 0.0.0.0:8000 --preload --log-level=debug --timeout 120'"
+
+  postgresql:
+    image: postgres
+    ports:
+      - 5432:5432
+    env_file:
+      - ./.env
+    volumes:
+      - /var/cache/postgres_data_test:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 5050:80
+    env_file:
+      - ./.env
+    depends_on:
+      - postgresql

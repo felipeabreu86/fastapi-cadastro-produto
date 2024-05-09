@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Felipe Abreu <felipeabreu.rj@gmail.com>",]
+readme = "README.md"
+
+[tool.black]
+line-length = 119
+target-version = ["py37", "py38", "py39", "py310", "py311",]
+exclude = "((.eggs | .git | .pytest_cache | build | dist))"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+gunicorn = "^22.0.0"
+uvicorn = "^0.29.0"
+pydantic = "^2.7.1"
+pydantic-settings = "^2.2.1"
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.13.1"
+python-decouple = "^3.8"
+pytest = "^8.2.0"
+httpx = "^0.27.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401",]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
