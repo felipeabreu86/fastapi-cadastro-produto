@@ -29,3 +29,14 @@ def add_category(
 def list_categories(db_session: Session = Depends(get_db_session)):
     uc = CategoryUseCases(db_session=db_session)
     return uc.list_categories()
+
+
+@router.delete(
+    "/delete/{id}",
+    description="Delete category",
+)
+def delete_category(id: int, db_sesion: Session = Depends(get_db_session)):
+    uc = CategoryUseCases(db_session=db_sesion)
+    uc.delete_category(id=id)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
