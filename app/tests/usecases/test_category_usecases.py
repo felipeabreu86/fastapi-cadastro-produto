@@ -1,14 +1,18 @@
 import pytest
 from app.usecases.category_usecases import CategoryUseCases
-from app.database.models import Category as CategoryModel
-from app.schemas.category import Category, CategoryOutput
+from app.models.category_model import Category as CategoryModel
+from app.schemas.category import Category
 from fastapi.exceptions import HTTPException
+from fastapi_pagination import Page
 
 
 def test_add_category_uc(db_session):
     uc = CategoryUseCases(db_session)
+
     category = Category(name="Roupa", slug="roupa")
+
     uc.add_category(category=category)
+
     categories_on_db = db_session.query(CategoryModel).all()
 
     assert len(categories_on_db) == 1
@@ -22,13 +26,14 @@ def test_add_category_uc(db_session):
 def test_list_categories_uc(db_session, categories_on_db):
     uc = CategoryUseCases(db_session=db_session)
 
-    categories = uc.list_categories()
+    page = uc.list_categories(page=1, size=2)
 
-    assert len(categories) == 4
-    assert type(categories[0]) == CategoryOutput
-    assert categories[0].id == categories_on_db[0].id
-    assert categories[0].name == categories_on_db[0].name
-    assert categories[0].slug == categories_on_db[0].slug
+    assert type(page) == Page
+    assert len(page.items) == 2
+    assert page.total == 4
+    assert page.page == 1
+    assert page.size == 2
+    assert page.pages == 2
 
 
 def test_delete_category(db_session):
@@ -45,6 +50,5 @@ def test_delete_category(db_session):
 
 def test_delete_category_non_exist(db_session):
     uc = CategoryUseCases(db_session=db_session)
-
     with pytest.raises(HTTPException):
         uc.delete_category(id=1)

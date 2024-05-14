@@ -4,7 +4,12 @@ from app.schemas.category import Category
 
 
 def test_product_schema():
-    product = Product(name="Camisa Mike", slug="camisa-mike", price=22.99, stock=22)
+    product = Product(
+        name="Camisa Mike",
+        slug="camisa-mike",
+        price=22.99,
+        stock=22,
+    )
 
     assert product.model_dump() == {
         "name": "Camisa Mike",
@@ -74,14 +79,7 @@ def test_product_input_schema():
 def test_product_output_schema():
     category = Category(name="Roupa", slug="roupa")
 
-    product_output = ProductOutput(
-        id=1,
-        name="Camisa",
-        slug="camisa",
-        price=10,
-        stock=10,
-        category=category,
-    )
+    product_output = ProductOutput(id=1, name="Camisa", slug="camisa", price=10, stock=10, category=category)
 
     assert product_output.model_dump() == {
         "id": 1,
@@ -89,8 +87,5 @@ def test_product_output_schema():
         "slug": "camisa",
         "price": 10,
         "stock": 10,
-        "category": {
-            "name": "Roupa",
-            "slug": "roupa",
-        },
+        "category": {"name": "Roupa", "slug": "roupa"},
     }

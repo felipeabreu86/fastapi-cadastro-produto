@@ -1,42 +1,38 @@
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Response, status, Query
 from sqlalchemy.orm import Session
-from app.core.deps import get_db_session
 from app.schemas.category import Category, CategoryOutput
+from app.core.deps import get_db_session, auth
 from app.usecases.category_usecases import CategoryUseCases
+from fastapi_pagination import Page
 
 
-router = APIRouter(prefix="/category", tags=["Category"])
-
-
-@router.post(
-    "/add",
-    status_code=status.HTTP_201_CREATED,
-    description="Add new category",
+router = APIRouter(
+    prefix="/category",
+    tags=["Category"],
+    dependencies=[Depends(auth)],
 )
-def add_category(
-    category: Category,
-    db_session: Session = Depends(get_db_session),
-):
-    CategoryUseCases(db_session).add_category(category)
+
+
+@router.post("/add", status_code=status.HTTP_201_CREATED, description="Add new category")
+def add_category(category: Category, db_session: Session = Depends(get_db_session)):
+    uc = CategoryUseCases(db_session=db_session)
+    uc.add_category(category=category)
     return Response(status_code=status.HTTP_201_CREATED)
 
 
-@router.get(
-    "/list",
-    status_code=status.HTTP_200_OK,
-    description="List categories",
-)
-def list_categories(db_session: Session = Depends(get_db_session)):
+@router.get("/list", response_model=Page[CategoryOutput], description="List categories")
+def list_categories(
+    page: int = Query(1, ge=1, description="Page number"),
+    size: int = Query(50, ge=1, le=100, description="Size of page"),
+    db_session: Session = Depends(get_db_session),
+):
     uc = CategoryUseCases(db_session=db_session)
-    return uc.list_categories()
+    response = uc.list_categories(page=page, size=size)
+    return response
 
 
-@router.delete(
-    "/delete/{id}",
-    description="Delete category",
-)
+@router.delete("/delete/{id}", description="Delete category")
 def delete_category(id: int, db_sesion: Session = Depends(get_db_session)):
     uc = CategoryUseCases(db_session=db_sesion)
     uc.delete_category(id=id)
-
     return Response(status_code=status.HTTP_204_NO_CONTENT)
