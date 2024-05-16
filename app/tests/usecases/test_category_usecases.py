@@ -8,11 +8,8 @@ from fastapi_pagination import Page
 
 def test_add_category_uc(db_session):
     uc = CategoryUseCases(db_session)
-
     category = Category(name="Roupa", slug="roupa")
-
     uc.add_category(category=category)
-
     categories_on_db = db_session.query(CategoryModel).all()
 
     assert len(categories_on_db) == 1
@@ -25,7 +22,6 @@ def test_add_category_uc(db_session):
 
 def test_list_categories_uc(db_session, categories_on_db):
     uc = CategoryUseCases(db_session=db_session)
-
     page = uc.list_categories(page=1, size=2)
 
     assert type(page) == Page
@@ -43,12 +39,13 @@ def test_delete_category(db_session):
 
     uc = CategoryUseCases(db_session=db_session)
     uc.delete_category(id=category_model.id)
-
     category_model = db_session.query(CategoryModel).first()
+
     assert category_model is None
 
 
 def test_delete_category_non_exist(db_session):
     uc = CategoryUseCases(db_session=db_session)
+
     with pytest.raises(HTTPException):
         uc.delete_category(id=1)

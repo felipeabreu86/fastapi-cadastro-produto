@@ -8,11 +8,8 @@ from fastapi_pagination import Page
 
 def test_add_product_uc(db_session, categories_on_db):
     uc = ProductUseCases(db_session)
-
     product = Product(name="Camisa Mike", slug="camisa-mike", price=22.99, stock=22)
-
     uc.add_product(product=product, category_slug=categories_on_db[0].slug)
-
     product_on_db = db_session.query(ProductModel).first()
 
     assert product_on_db is not None
@@ -28,7 +25,6 @@ def test_add_product_uc(db_session, categories_on_db):
 
 def test_add_product_uc_invalid_category(db_session):
     uc = ProductUseCases(db_session)
-
     product = Product(name="Camisa Mike", slug="camisa-mike", price=22.99, stock=22)
 
     with pytest.raises(HTTPException):
@@ -37,10 +33,8 @@ def test_add_product_uc_invalid_category(db_session):
 
 def test_update_product(db_session, product_on_db):
     product = Product(name="Camisa Mike", slug="camisa-mike", price=22.99, stock=22)
-
     uc = ProductUseCases(db_session=db_session)
     uc.update_product(id=product_on_db.id, product=product)
-
     product_updated_on_db = db_session.query(ProductModel).filter_by(id=product_on_db.id).first()
 
     assert product_updated_on_db is not None
@@ -52,7 +46,6 @@ def test_update_product(db_session, product_on_db):
 
 def test_update_product_invalid_id(db_session):
     product = Product(name="Camisa Mike", slug="camisa-mike", price=22.99, stock=22)
-
     uc = ProductUseCases(db_session=db_session)
 
     with pytest.raises(HTTPException):
@@ -62,7 +55,6 @@ def test_update_product_invalid_id(db_session):
 def test_delete_product(db_session, product_on_db):
     uc = ProductUseCases(db_session=db_session)
     uc.delete_product(id=product_on_db.id)
-
     products_on_db = db_session.query(ProductModel).all()
 
     assert len(products_on_db) == 0
@@ -77,7 +69,6 @@ def test_delete_product_non_exist(db_session):
 
 def test_list_products_uc(db_session, products_on_db):
     uc = ProductUseCases(db_session=db_session)
-
     page = uc.list_products(page=1, size=2)
 
     assert type(page) == Page
@@ -86,14 +77,12 @@ def test_list_products_uc(db_session, products_on_db):
     assert page.page == 1
     assert page.size == 2
     assert page.pages == 2
-
     assert page.items[0].name == products_on_db[0].name
     assert page.items[0].category.name == products_on_db[0].category.name
 
 
 def test_list_products_uc_with_search(db_session, products_on_db):
     uc = ProductUseCases(db_session=db_session)
-
     page = uc.list_products(search="mike")
 
     assert type(page) == Page
